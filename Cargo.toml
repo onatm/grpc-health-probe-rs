@@ -1,0 +1,7 @@
+[package]
+name = "grpc-health-probe"
+version = "0.1.0"
+authors = ["Onat Mercan <onatmercan@gmail.com>"]
+edition = "2021"
+
+[dependencies]
