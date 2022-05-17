@@ -22,7 +22,10 @@ struct Flags {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let flags = Flags::parse();
 
-    let channel = Channel::from_shared(flags.addr)?.connect().await?;
+    let channel = Channel::from_shared(flags.addr)?
+        .user_agent(flags.user_agent)?
+        .connect()
+        .await?;
 
     let mut client = HealthClient::new(channel);
 
