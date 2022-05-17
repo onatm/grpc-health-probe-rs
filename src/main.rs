@@ -12,19 +12,19 @@ struct Flags {
     addr: String,
 
     /// service name to check
-    #[clap(long, default_value = "\"\"", required = false)]
+    #[clap(long, default_value = "\"\"")]
     service: String,
 
     /// user-agent header value of health check requests
-    #[clap(long, default_value = "grpc_health_probe", required = false)]
+    #[clap(long, default_value = "grpc_health_probe")]
     user_agent: String,
 
     /// timeout for establishing connection
-    #[clap(long, default_value_t = 1, required = false)]
+    #[clap(long, default_value_t = 1)]
     connect_timeout: u64,
 
     /// timeout for health check rpc
-    #[clap(long, default_value_t = 1, required = false)]
+    #[clap(long, default_value_t = 1)]
     rpc_timeout: u64,
 }
 
