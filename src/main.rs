@@ -23,12 +23,12 @@ struct Flags {
     #[clap(long, default_value = "grpc_health_probe")]
     user_agent: String,
 
-    /// timeout for establishing connection
-    #[clap(long, default_value_t = 1)]
+    /// timeout in milliseconds for establishing connection
+    #[clap(long, default_value_t = 1000)]
     connect_timeout: u64,
 
-    /// timeout for health check rpc
-    #[clap(long, default_value_t = 1)]
+    /// timeout in milliseconds for health check rpc
+    #[clap(long, default_value_t = 1000)]
     rpc_timeout: u64,
 
     /// use TLS (default: false, INSECURE plaintext transport)
@@ -72,8 +72,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut channel_builder = Channel::from_shared(addr.clone())?
         .user_agent(flags.user_agent)?
-        .connect_timeout(Duration::from_secs(flags.connect_timeout))
-        .timeout(Duration::from_secs(flags.rpc_timeout));
+        .connect_timeout(Duration::from_millis(flags.connect_timeout))
+        .timeout(Duration::from_millis(flags.rpc_timeout));
 
     if flags.tls {
         let mut tls_config = ClientTlsConfig::new();
