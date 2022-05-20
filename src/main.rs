@@ -20,7 +20,7 @@ struct Flags {
     service: String,
 
     /// user-agent header value of health check requests
-    #[clap(long, default_value = "grpc_health_probe")]
+    #[clap(long, default_value = "grpc_health_probe_rs")]
     user_agent: String,
 
     /// timeout in milliseconds for establishing connection
