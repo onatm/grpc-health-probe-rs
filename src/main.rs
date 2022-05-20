@@ -68,7 +68,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         process::exit(1);
     }
 
-    let mut channel_builder = Channel::from_shared(flags.addr)?
+    let addr = flags.addr;
+
+    let mut channel_builder = Channel::from_shared(addr.clone())?
         .user_agent(flags.user_agent)?
         .connect_timeout(Duration::from_secs(flags.connect_timeout))
         .timeout(Duration::from_secs(flags.rpc_timeout));
@@ -90,7 +92,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         channel_builder = channel_builder.tls_config(tls_config)?;
     }
 
-    let channel = channel_builder.connect().await?;
+    let channel = channel_builder.connect().await.unwrap_or_else(|err| {
+        println!(
+            "error: failed to connect service at {}: {:?}",
+            addr.clone(),
+            err
+        );
+        process::exit(2);
+    });
 
     let mut client = HealthClient::new(channel);
 
