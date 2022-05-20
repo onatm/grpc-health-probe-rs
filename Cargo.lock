@@ -262,7 +262,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "grpc-health-probe"
+name = "grpc_health_probe"
 version = "1.0.0"
 dependencies = [
  "clap",

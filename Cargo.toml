@@ -1,5 +1,5 @@
 [package]
-name = "grpc-health-probe"
+name = "grpc_health_probe"
 version = "1.0.0"
 authors = ["Onat Mercan <onatmercan@gmail.com>"]
 edition = "2021"
