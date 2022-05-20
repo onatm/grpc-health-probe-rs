@@ -126,7 +126,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 tonic::Code::Unimplemented =>
                     println!("error: this server does not implement the grpc health protocol (grpc.health.v1.Health): {}", status.message()),
                 tonic::Code::DeadlineExceeded => println!("timeout: health rpc did not complete within {}", flags.rpc_timeout),
-                _ => println!("error: health rpc failed: {}", status),
+                _ => println!("error: health rpc failed: {}", status.message()),
             };
             process::exit(3);
         }
