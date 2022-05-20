@@ -3,6 +3,16 @@ name = "grpc_health_probe"
 version = "1.0.0"
 authors = ["Onat Mercan <onatmercan@gmail.com>"]
 edition = "2021"
+description = "A utility to run health checks for gRPC services"
+documentation = "https://github.com/onatm/grpc-health-probe-rs"
+homepage = "https://github.com/onatm/grpc-health-probe-rs"
+repository = "https://github.com/onatm/grpc-health-probe-rs"
+readme = "README.md"
+keywords = ["grpc", "grpc-health", "kubernetes"]
+license = "MIT"
+exclude = [
+    ".github/*",
+]
 
 [dependencies]
 clap = { version = "3.1", features = ["derive"] }
