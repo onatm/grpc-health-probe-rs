@@ -6,6 +6,6 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "3.1", features = ["derive"] }
-tokio = { version = "1.18", features = ["rt-multi-thread"] }
+tokio = { version = "1.18", features = ["rt-multi-thread", "fs"] }
 tonic = { version = "0.7", features = ["tls"] }
 tonic-health = "0.6.0"

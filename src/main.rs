@@ -1,11 +1,12 @@
-use std::{process, time::Duration};
-
 use clap::Parser;
+use std::{process, time::Duration};
 use tonic::{
     transport::{Certificate, Channel, ClientTlsConfig},
     Request,
 };
-use tonic_health::proto::{health_client::HealthClient, HealthCheckRequest};
+use tonic_health::proto::{
+    health_check_response::ServingStatus, health_client::HealthClient, HealthCheckRequest,
+};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -34,13 +35,13 @@ struct Flags {
     #[clap(long)]
     tls: bool,
 
-    /// (with --tls) don't verify the certificate (INSECURE) presented by the server (default: false)
+    /// (with -tls, optional) file containing trusted certificates for verifying server
     #[clap(long)]
-    tls_no_verify: bool,
+    tls_ca_cert: Option<String>,
 
     /// (with -tls) override the hostname used to verify the server certificate
-    #[clap(long, default_value = "")]
-    tls_server_name: String,
+    #[clap(long)]
+    tls_server_name: Option<String>,
 }
 
 #[tokio::main]
@@ -57,7 +58,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         process::exit(1);
     }
 
-    let vault_ca_cert = "";
+    if !flags.tls && flags.tls_ca_cert.is_some() {
+        println!("specified --tls-ca-cert without specifying --tls");
+        process::exit(1);
+    }
+
+    if !flags.tls && flags.tls_server_name.is_some() {
+        println!("specified --tls-server-name without specifying --tls");
+        process::exit(1);
+    }
 
     let mut channel_builder = Channel::from_shared(flags.addr)?
         .user_agent(flags.user_agent)?
@@ -65,10 +74,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .timeout(Duration::from_secs(flags.rpc_timeout));
 
     if flags.tls {
-        let ca = Certificate::from_pem(&vault_ca_cert);
-        let tls_config = ClientTlsConfig::new()
-            .ca_certificate(ca)
-            .domain_name(flags.tls_server_name);
+        let mut tls_config = ClientTlsConfig::new();
+
+        if let Some(tls_ca_cert) = flags.tls_ca_cert {
+            let pem = tokio::fs::read(tls_ca_cert).await?;
+
+            let ca = Certificate::from_pem(pem);
+            tls_config = tls_config.ca_certificate(ca);
+        }
+
+        if let Some(tls_server_name) = flags.tls_server_name {
+            tls_config = tls_config.domain_name(tls_server_name);
+        }
 
         channel_builder = channel_builder.tls_config(tls_config)?;
     }
@@ -81,9 +98,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         service: flags.service,
     });
 
-    let response = client.check(request).await.expect("Failed");
-
-    println!("{:?}", response);
-
-    Ok(())
+    match client.check(request).await {
+        Ok(response) => {
+            let status = response.into_inner().status();
+            match status {
+                ServingStatus::Serving => {
+                    println!("status: {:?}", ServingStatus::Serving);
+                    Ok(())
+                }
+                _ => {
+                    println!("service unhealthy (responded with {:?})", status);
+                    process::exit(4);
+                }
+            }
+        }
+        Err(status) => {
+            match status.code() {
+                tonic::Code::Unimplemented =>
+                    println!("error: this server does not implement the grpc health protocol (grpc.health.v1.Health): {}", status.message()),
+                tonic::Code::DeadlineExceeded => println!("timeout: health rpc did not complete within {}", flags.rpc_timeout),
+                _ => println!("error: health rpc failed: {}", status),
+            };
+            process::exit(3);
+        }
+    }
 }
