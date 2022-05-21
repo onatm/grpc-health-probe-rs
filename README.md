@@ -12,12 +12,12 @@ This port does not provide a way to skip TLS verification and there are limited 
 
 ### From binary
 
-You can directly [download the grpc-health-probe executable](https://github.com/onatm/grpc-health-probe/releases).
+You can directly [download the grpc_health_probe executable](https://github.com/onatm/grpc-health-probe-rs/releases).
 
 ### Install from crates.io
 
 ```sh
-cargo install grpc-health-probe
+cargo install grpc_health_probe
 ```
 
 ### Build Manually
@@ -34,7 +34,7 @@ Alternatively, run:
 cargo build --release
 ```
 
-then put the resulting `target/release/grpc-health-probe` executable on your PATH.
+then put the resulting `target/release/grpc_health_probe` executable on your PATH.
 
 ## Examples
 
