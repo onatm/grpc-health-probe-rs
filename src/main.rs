@@ -44,28 +44,33 @@ struct Flags {
     tls_server_name: Option<String>,
 }
 
+const ERROR_CODE_INVALID_ARGUMENTS: i32 = 1;
+const ERROR_CODE_CONNECTION_FAILURE: i32 = 2;
+const ERROR_CODE_RPC_FAILURE: i32 = 3;
+const ERROR_CODE_UNHEALTHY: i32 = 4;
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let flags = Flags::parse();
 
     if flags.connect_timeout == 0 {
         println!("--connect-timeout must be greater than zero");
-        process::exit(1);
+        process::exit(ERROR_CODE_INVALID_ARGUMENTS);
     }
 
     if flags.rpc_timeout == 0 {
         println!("--rpc-timeout must be greater than zero");
-        process::exit(1);
+        process::exit(ERROR_CODE_INVALID_ARGUMENTS);
     }
 
     if !flags.tls && flags.tls_ca_cert.is_some() {
         println!("specified --tls-ca-cert without specifying --tls");
-        process::exit(1);
+        process::exit(ERROR_CODE_INVALID_ARGUMENTS);
     }
 
     if !flags.tls && flags.tls_server_name.is_some() {
         println!("specified --tls-server-name without specifying --tls");
-        process::exit(1);
+        process::exit(ERROR_CODE_INVALID_ARGUMENTS);
     }
 
     let addr = flags.addr;
@@ -98,7 +103,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             addr.clone(),
             err
         );
-        process::exit(2);
+        process::exit(ERROR_CODE_CONNECTION_FAILURE);
     });
 
     let mut client = HealthClient::new(channel);
@@ -117,7 +122,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 _ => {
                     println!("service unhealthy (responded with {:?})", status);
-                    process::exit(4);
+                    process::exit(ERROR_CODE_UNHEALTHY);
                 }
             }
         }
@@ -128,7 +133,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 tonic::Code::DeadlineExceeded => println!("timeout: health rpc did not complete within {}", flags.rpc_timeout),
                 _ => println!("error: health rpc failed: {}", status.message()),
             };
-            process::exit(3);
+            process::exit(ERROR_CODE_RPC_FAILURE);
         }
     }
 }
