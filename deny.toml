@@ -1,0 +1,9 @@
+[advisories]
+ignore = [
+    #"RUSTSEC-0000-0000",
+]
+
+[bans]
+multiple-versions = "allow"
+wildcards = "allow"
+highlight = "all"
