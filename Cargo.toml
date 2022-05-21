@@ -1,6 +1,6 @@
 [package]
 name = "grpc_health_probe"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Onat Mercan <onatmercan@gmail.com>"]
 edition = "2021"
 description = "A utility to run health checks for gRPC services"
