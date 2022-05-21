@@ -31,7 +31,7 @@ struct Flags {
     #[clap(long, default_value_t = 1000)]
     rpc_timeout: u64,
 
-    /// use TLS (default: false, INSECURE plaintext transport)
+    /// use TLS
     #[clap(long)]
     tls: bool,
 
@@ -39,7 +39,7 @@ struct Flags {
     #[clap(long)]
     tls_ca_cert: Option<String>,
 
-    /// (with -tls) override the hostname used to verify the server certificate
+    /// (with -tls, optional) override the hostname used to verify the server certificate
     #[clap(long)]
     tls_server_name: Option<String>,
 }
