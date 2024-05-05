@@ -4,7 +4,7 @@ use tonic::{
     transport::{Certificate, Channel, ClientTlsConfig},
     Request,
 };
-use tonic_health::proto::{
+use tonic_health::pb::{
     health_check_response::ServingStatus, health_client::HealthClient, HealthCheckRequest,
 };
 
