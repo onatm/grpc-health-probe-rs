@@ -35,11 +35,21 @@ struct Flags {
     #[clap(long)]
     tls: bool,
 
-    /// (with -tls, optional) file containing trusted certificates for verifying server
+    /// (with --tls, optional) file containing trusted certificates for verifying server
     #[clap(long)]
     tls_ca_cert: Option<String>,
 
-    /// (with -tls, optional) override the hostname used to verify the server certificate
+    /// (with --tls, optional) file containing client certificate for authenticating to the server
+    /// (requires --tls-client-key)
+    #[clap(long)]
+    tls_client_cert: Option<String>,
+
+    /// (with --tls, optional) file containing client private key for authenticating to the server
+    /// (requires --tls-client-cert)
+    #[clap(long)]
+    tls_client_key: Option<String>,
+
+    /// (with --tls, optional) override the hostname used to verify the server certificate
     #[clap(long)]
     tls_server_name: Option<String>,
 }
@@ -73,6 +83,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         process::exit(ERROR_CODE_INVALID_ARGUMENTS);
     }
 
+    if !flags.tls && flags.tls_client_cert.is_some() {
+        println!("specified --tls-client-cert without specifying --tls");
+        process::exit(ERROR_CODE_INVALID_ARGUMENTS);
+    }
+
+    if !flags.tls && flags.tls_client_key.is_some() {
+        println!("specified --tls-client-key without specifying --tls");
+        process::exit(ERROR_CODE_INVALID_ARGUMENTS);
+    }
+
+    if flags.tls_client_cert.is_some() && flags.tls_client_key.is_none() {
+        println!("specified --tls-client-cert without specifying --tls-client-key");
+        process::exit(ERROR_CODE_INVALID_ARGUMENTS);
+    }
+
+    if flags.tls_client_key.is_some() && flags.tls_client_cert.is_none() {
+        println!("specified --tls-client-key without specifying --tls-client-cert");
+        process::exit(ERROR_CODE_INVALID_ARGUMENTS);
+    }
+
     let addr = flags.addr;
 
     let mut channel_builder = Channel::from_shared(addr.clone())?
@@ -92,6 +122,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         if let Some(tls_server_name) = flags.tls_server_name {
             tls_config = tls_config.domain_name(tls_server_name);
+        }
+
+        if let (Some(client_cert), Some(client_key)) = (flags.tls_client_cert, flags.tls_client_key)
+        {
+            let cert = tokio::fs::read(client_cert).await?;
+            let key = tokio::fs::read(client_key).await?;
+
+            let identity = tonic::transport::Identity::from_pem(cert, key);
+            tls_config = tls_config.identity(identity);
         }
 
         channel_builder = channel_builder.tls_config(tls_config)?;
