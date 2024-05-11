@@ -1,9 +1,19 @@
 [advisories]
+yanked = "warn"
 ignore = [
-    #"RUSTSEC-0000-0000",
+    "RUSTSEC-2021-0145",
+    "RUSTSEC-2024-0336"
 ]
+
+[licenses]
+unlicensed = "warn"
+allow = ["Apache-2.0", "MIT", "ISC", "Unicode-DFS-2016"]
+confidence-threshold = 0.8
+exceptions = []
 
 [bans]
 multiple-versions = "allow"
-wildcards = "allow"
-highlight = "all"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

@@ -1,15 +1,51 @@
-name: build
+name: Build
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - 'main'
 
 jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: "rustfmt, clippy"
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: rustfmt
+        run: cargo fmt -- --check --color always
+
+      - run: cargo fetch
+
+      - name: Install xmllint
+        run: sudo apt-get install -y lld
+
+      - name: clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+  deps:
+    name: lint deps
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install xmllint
+        run: sudo apt-get install -y lld
+      - uses: EmbarkStudios/cargo-deny-action@v1
+
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout sources
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
       - name: Install xmllint
         run: sudo apt-get install -y lld
-      - name: Build
+      - name: build
         run: cargo build --release
