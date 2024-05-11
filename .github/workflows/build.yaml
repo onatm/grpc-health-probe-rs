@@ -24,6 +24,9 @@ jobs:
 
       - run: cargo fetch
 
+      - name: Install xmllint
+        run: sudo apt-get install -y lld
+
       - name: clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
 
@@ -32,6 +35,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+      - name: Install xmllint
+        run: sudo apt-get install -y lld
       - uses: EmbarkStudios/cargo-deny-action@v1
 
   build:
