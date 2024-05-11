@@ -1,5 +1,5 @@
-VERSION 0.6
-FROM rust:1.59
+VERSION 0.8
+FROM rust:1
 WORKDIR /grpc_health_probe
 
 format:
@@ -19,7 +19,6 @@ install-chef:
 prepare-cache:
     FROM +install-chef
     RUN apt-get update
-    RUN apt-get install lld protobuf-compiler -y
     COPY --dir src Cargo.lock Cargo.toml .
     RUN cargo chef prepare
     SAVE ARTIFACT recipe.json
@@ -28,7 +27,6 @@ build-cache:
     FROM +install-chef
     COPY +prepare-cache/recipe.json ./
     RUN apt-get update
-    RUN apt-get install lld protobuf-compiler -y
     RUN cargo chef cook
     SAVE ARTIFACT target
     SAVE ARTIFACT $CARGO_HOME cargo_home
