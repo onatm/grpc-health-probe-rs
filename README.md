@@ -6,7 +6,7 @@ rust implementation of the [`grpc-health-probe`](https://github.com/grpc-ecosyst
 
 This command-line utility makes a RPC to `/grpc.health.v1.Health/Check`. If it responds with a `SERVING` status, the `grpc_health_probe` will exit with success, otherwise it will exit with a non-zero exit code (documented below).
 
-This port does not provide a way to skip TLS verification and there are limited options for [configuring TLS](#health-checking-tls-servers).
+This port does not provide a way to skip TLS verification, see [configuring TLS](#health-checking-tls-servers).
 
 ## Installation
 
@@ -83,11 +83,13 @@ spec:
 
 ## Health Checking TLS Servers
 
-| Option                  | Description                                                           |
-| :---------------------- | --------------------------------------------------------------------- |
-| **`--tls`**             | use TLS (default: false)                                              |
-| **`--tls-ca-cert`**     | path to file containing CA certificates (to override system root CAs) |
-| **`--tls-server-name`** | override the hostname used to verify the server certificate           |
+| Option                  | Description                                                                 |
+| :---------------------- | --------------------------------------------------------------------------- |
+| **`--tls`**             | use TLS (default: false)                                                    |
+| **`--tls-ca-cert`**     | path to file containing CA certificates (to override system root CAs)       |
+| **`--tls-server-name`** | override the hostname used to verify the server certificate                 |
+| **`--tls-client-cert`** | path to file containing client certificate for authenticating to the server |
+| **`--tls-client-key`**  | path to file containing client private key for authenticating to the server |
 
 ## Other Available Flags
 
