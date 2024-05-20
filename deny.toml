@@ -1,15 +1,20 @@
 [advisories]
 yanked = "warn"
 ignore = [
-    "RUSTSEC-2021-0145",
-    "RUSTSEC-2024-0336"
+    # "RUSTSEC-XXXX-YYYY"
 ]
 
 [licenses]
-unlicensed = "warn"
-allow = ["Apache-2.0", "MIT", "ISC", "Unicode-DFS-2016"]
+allow = ["Apache-2.0", "MIT", "ISC", "Unicode-DFS-2016", "BSD-3-Clause", "OpenSSL"]
 confidence-threshold = 0.8
 exceptions = []
+
+[[licenses.clarify]]
+crate = "ring"
+expression = "OpenSSL"
+license-files = [
+    { path = "LICENSE", hash = 0xbd0eed23 },
+]
 
 [bans]
 multiple-versions = "allow"
